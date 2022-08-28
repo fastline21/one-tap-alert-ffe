@@ -28,6 +28,4 @@ app.get('/', (req, res) => {
 const port = process.env.PORT || 5000;
 const hostname = process.env.HOSTNAME || 'localhost';
 
-app.listen(port, () =>
-	console.log(`Server running on http://${hostname}:${port}`)
-);
+app.listen(port, () => console.log(`Server running on ${port}`));
