@@ -1,35 +1,36 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+
 const router = express.Router();
 
-const Users = require('./../models/users');
+const Users = require("./../models/users");
 
-const routeAuth = require('./../middleware/route-auth');
+const routeAuth = require("./../middleware/route-auth");
 
-router.get('/', routeAuth, async (req, res) => {
+router.get("/", routeAuth, async (req, res) => {
 	const result = await Users.find();
 
 	res.json({ data: result });
 });
 
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
 	const { username, password, password2, user_type_id } = req.body;
 
 	if ((!username, !password, !user_type_id)) {
 		return res.status(404).json({
-			error: 'Please fill in all the required fields',
+			error: "Please fill in all the required fields",
 		});
 	}
 
 	if (password !== password2) {
-		return res.status(400).json({ error: 'Password not match' });
+		return res.status(400).json({ error: "Password not match" });
 	}
 
 	try {
 		const user = await Users.findOne({ username });
 
 		if (user) {
-			return res.status(400).json({ message: 'User already registered' });
+			return res.status(400).json({ message: "User already registered" });
 		}
 
 		const salt = await bcrypt.genSalt(10);
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
 		return res.json({ data: { success: true } });
 	} catch (error) {
 		console.error(error.message);
-		res.status(500).send({ error: 'Server Error' });
+		res.status(500).send({ error: "Server Error" });
 	}
 });
 
