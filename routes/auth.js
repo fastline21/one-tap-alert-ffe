@@ -9,25 +9,31 @@ const routeAuth = require("./../middleware/route-auth");
 const auth = require("./../middleware/auth");
 
 router.post("/", routeAuth, async (req, res) => {
+	console.log(req.body);
 	const { username, password } = req.body;
 
 	if (!username || !password) {
-		return res
-			.status(404)
-			.json({ error: "Please fill in all the required fields." });
+		return res.status(404).json({
+			data: { message: "Please fill in all the required fields" },
+			status_code: 404,
+		});
 	}
 
 	try {
 		let user = await Users.findOne({ username });
 
 		if (!user) {
-			return res.status(404).json({ error: "User not found." });
+			return res
+				.status(404)
+				.json({ data: { message: "User not found" }, status_code: 404 });
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
 
 		if (!isMatch) {
-			return res.status(400).json({ error: "Invalid Credentials" });
+			return res
+				.status(400)
+				.json({ data: { message: "Invalid Credentials" }, status_code: 400 });
 		}
 
 		const payload = {
@@ -39,7 +45,7 @@ router.post("/", routeAuth, async (req, res) => {
 		jwt.sign(payload, process.env.JWT_SECRET, (err, token) => {
 			if (err) throw err;
 
-			return res.json({ token });
+			return res.json({ data: { token }, status_code: 200 });
 		});
 	} catch (error) {
 		console.error(error.message);

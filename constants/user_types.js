@@ -1,0 +1,6 @@
+module.exports = {
+	USER_TYPES: {
+		RESIDENT: "630e16a52cd4035d6976d703",
+		RESPONDER: "630e16c32cd4035d6976d704",
+	},
+};

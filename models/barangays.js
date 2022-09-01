@@ -2,30 +2,25 @@ const mongoose = require("mongoose");
 
 const { ObjectId } = mongoose.Types;
 
-const UserInfoSchema = mongoose.Schema({
+const BarangaysSchema = mongoose.Schema({
 	user_id: {
 		type: ObjectId,
 		required: true,
 		ref: "users",
 	},
-	first_name: {
+	distric_code: {
+		type: Number,
+		required: true,
+	},
+	name: {
 		type: String,
 		required: true,
 	},
-	middle_name: {
-		type: String,
-	},
-	last_name: {
-		type: String,
-		required: true,
-	},
-	birthdate: {
-		type: Date,
-		required: true,
-	},
-	gender_id: {
+	contact_id: {
 		type: ObjectId,
-		required: true,
+	},
+	contact_person_id: {
+		type: ObjectId,
 	},
 	date_added: {
 		type: Date,
@@ -40,4 +35,4 @@ const UserInfoSchema = mongoose.Schema({
 	},
 });
 
-module.exports = mongoose.model("user_info", UserInfoSchema);
+module.exports = mongoose.model("barangays", BarangaysSchema);

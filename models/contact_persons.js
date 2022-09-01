@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const { ObjectId } = mongoose.Types;
 
-const UserInfoSchema = mongoose.Schema({
+const ContactPersonsSchema = mongoose.Schema({
 	user_id: {
 		type: ObjectId,
 		required: true,
@@ -19,14 +19,6 @@ const UserInfoSchema = mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	birthdate: {
-		type: Date,
-		required: true,
-	},
-	gender_id: {
-		type: ObjectId,
-		required: true,
-	},
 	date_added: {
 		type: Date,
 		default: Date.now,
@@ -40,4 +32,4 @@ const UserInfoSchema = mongoose.Schema({
 	},
 });
 
-module.exports = mongoose.model("user_info", UserInfoSchema);
+module.exports = mongoose.model("contact_persons", ContactPersonsSchema);

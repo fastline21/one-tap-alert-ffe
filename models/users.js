@@ -1,4 +1,6 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+
+const { ObjectId } = mongoose.Types;
 
 const UsersSchema = mongoose.Schema({
 	username: {
@@ -10,8 +12,8 @@ const UsersSchema = mongoose.Schema({
 		required: true,
 	},
 	user_type_id: {
-		type: mongoose.Types.ObjectId,
-		ref: 'user_types',
+		type: ObjectId,
+		ref: "user_types",
 	},
 	date_added: {
 		type: Date,
@@ -26,4 +28,4 @@ const UsersSchema = mongoose.Schema({
 	},
 });
 
-module.exports = mongoose.model('users', UsersSchema);
+module.exports = mongoose.model("users", UsersSchema);
