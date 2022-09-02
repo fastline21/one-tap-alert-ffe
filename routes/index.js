@@ -7,10 +7,13 @@ router.use('/users', require('./users'));
 // Auth API
 router.use('/auth', require('./auth'));
 
-// User Info
+// User Info API
 router.use('/user-info', require('./user-info'));
 
-// Emergency Types
+// User Types API
+router.use('/user-types', require('./user-types'));
+
+// Emergency Types API
 router.use('/emergency-types', require('./emergency-types'));
 
 module.exports = router;
