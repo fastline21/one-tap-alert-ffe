@@ -59,7 +59,7 @@ router.get('/', routeAuth, auth, async (req, res) => {
       '-password -date -username'
     );
 
-    res.json({ data: { user_id: user }, status_code: 200 });
+    res.json({ data: { user_id: user._id }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));
     res
