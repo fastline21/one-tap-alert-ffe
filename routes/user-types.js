@@ -30,6 +30,26 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
 // Create new user type
 
 // Update user type
+router.patch('/:id', routeAuth, auth, async (req, res) => {
+  const {
+    params: { id },
+    body: { name },
+  } = req;
+
+  try {
+    const result = await UserTypes.findByIdAndUpdate(id, { name });
+
+    res.status(200).json({
+      data: { message: `You successfully update ${result.name}` },
+      status_code: 200,
+    });
+  } catch (error) {
+    res.status(error.status_code).json({
+      data: { message: error.message },
+      status_code: error.status_code,
+    });
+  }
+});
 
 // Delete user type
 
