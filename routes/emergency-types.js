@@ -37,7 +37,7 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
 
     res
       .status(200)
-      .json({ data: { emergency_types: result }, status_code: 200 });
+      .json({ data: { emergency_type: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));
     res
@@ -57,9 +57,9 @@ router.post('/', routeAuth, auth, async (req, res) => {
   }
 
   try {
-    const newUserType = new UserTypes({ name });
+    const newEmergencyType = new EmergencyTypes({ name });
 
-    await newUserType.save();
+    await newEmergencyType.save();
 
     return res.status(200).json({
       data: { message: `${name} is successfully created` },
