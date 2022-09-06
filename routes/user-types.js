@@ -15,42 +15,59 @@ router.get('/', routeAuth, auth, async (req, res) => {
       date_deleted: { $exists: false },
     }).select('-date_added -date_modified -date_deleted');
 
-    res.status(200).json({ data: { user_types: result }, status_code: 200 });
+    return res
+      .status(200)
+      .json({ data: { user_types: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));
-    res
+    return res
       .status(500)
       .json({ data: { message: 'Server error' }, status_code: 500 });
   }
 });
 
-// Get user type
+// Get single user type
 router.get('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
-  const result = await UserTypes.findById(id).select(
-    '-date_added -date_modified -date_deleted'
-  );
+  try {
+    const result = await UserTypes.findById(id).select(
+      '-date_added -date_modified -date_deleted'
+    );
 
-  res.status(200).json({ data: { user_type: result }, status_code: 200 });
+    return res
+      .status(200)
+      .json({ data: { user_type: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
 });
 
 // Create new user type
 router.post('/', routeAuth, auth, async (req, res) => {
   const { name } = req.body;
 
+  if (!name) {
+    return res
+      .status(404)
+      .json({ data: { message: 'Name is required' }, status_code: 404 });
+  }
+
   try {
     const newUserType = new UserTypes({ name });
 
     await newUserType.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       data: { message: `${name} is successfully created` },
       status_code: 200,
     });
   } catch (error) {
     console.error(JSON.stringify(error));
-    res
+    return res
       .status(500)
       .json({ data: { message: 'Server error' }, status_code: 500 });
   }
@@ -63,16 +80,23 @@ router.patch('/:id', routeAuth, auth, async (req, res) => {
     body: { name },
   } = req;
 
+  if (!name) {
+    return res.status(404).json({
+      data: { message: 'Name is required' },
+      status_code: 404,
+    });
+  }
+
   try {
     const result = await UserTypes.findByIdAndUpdate(id, { name });
 
-    res.status(200).json({
+    return res.status(200).json({
       data: { message: `You successfully update ${result.name}` },
       status_code: 200,
     });
   } catch (error) {
     console.error(JSON.stringify(error));
-    res
+    return res
       .status(500)
       .json({ data: { message: 'Server error' }, status_code: 500 });
   }
@@ -89,13 +113,13 @@ router.delete('/:id', routeAuth, auth, async (req, res) => {
       },
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       data: { message: `You successfully delete ${result.name}` },
       status_code: 200,
     });
   } catch (error) {
     console.error(JSON.stringify(error));
-    res
+    return res
       .status(500)
       .json({ data: { message: 'Server error' }, status_code: 500 });
   }

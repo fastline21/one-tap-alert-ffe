@@ -1,30 +1,131 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
+const express = require('express');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
-const EmergencyTypes = require("./../models/emergency_types");
+const EmergencyTypes = require('./../models/emergency_types');
 
-const routeAuth = require("./../middleware/route-auth");
-const auth = require("./../middleware/auth");
+const routeAuth = require('./../middleware/route-auth');
+const auth = require('./../middleware/auth');
 
-router.get("/", routeAuth, auth, async (req, res) => {
-	const result = await EmergencyTypes.find();
+// Get all emergency types
+router.get('/', routeAuth, auth, async (req, res) => {
+  try {
+    const result = await EmergencyTypes.find({
+      date_deleted: { $exists: false },
+    }).select('-date_added -date_modified -date_deleted');
 
-	res.json({ data: result });
+    res
+      .status(200)
+      .json({ data: { emergency_types: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
 });
 
-router.post("/", routeAuth, auth, async (req, res) => {
-	const { name, description = "" } = req.body;
+// Get single emergency types
+router.get('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
 
-	const newEmergencyType = new EmergencyTypes({
-		name,
-		description,
-	});
+  try {
+    const result = await EmergencyTypes.findById(id).select(
+      '-date_added -date_modified -date_deleted'
+    );
 
-	await newEmergencyType.save();
+    res
+      .status(200)
+      .json({ data: { emergency_types: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
 
-	res.json({ data: { success: true } });
+// Create new emergency type
+router.post('/', routeAuth, auth, async (req, res) => {
+  const { name, description = '' } = req.body;
+
+  if (!name) {
+    return res
+      .status(404)
+      .json({ data: { message: 'Name is required' }, status_code: 404 });
+  }
+
+  try {
+    const newUserType = new UserTypes({ name });
+
+    await newUserType.save();
+
+    return res.status(200).json({
+      data: { message: `${name} is successfully created` },
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
+
+// Update emergency type
+router.patch('/:id', routeAuth, auth, async (req, res) => {
+  const {
+    params: { id },
+    body: { name, description },
+  } = req;
+
+  if (!name) {
+    return res.status(404).json({
+      data: { message: 'Name is required' },
+      status_code: 404,
+    });
+  }
+
+  try {
+    const result = await EmergencyTypes.findByIdAndUpdate(id, {
+      name,
+      description,
+    });
+
+    return res.status(200).json({
+      data: { message: `You successfully update ${result.name}` },
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
+
+// Delete emergency type
+router.delete('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await EmergencyTypes.findByIdAndUpdate(id, {
+      $set: {
+        date_deleted: Date.now(),
+      },
+    });
+
+    return res.status(200).json({
+      data: { message: `You successfully delete ${result.name}` },
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
 });
 
 module.exports = router;
