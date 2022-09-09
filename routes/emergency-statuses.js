@@ -3,21 +3,21 @@ const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
-const EmergencyTypes = require('./../models/emergency_types');
+const EmergencyStatuses = require('./../models/emergency_statuses');
 
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('./../middleware/auth');
 
-// Get all emergency types
+// Get all emergency statuses
 router.get('/', routeAuth, auth, async (req, res) => {
   try {
-    const result = await EmergencyTypes.find({
+    const result = await EmergencyStatuses.find({
       date_deleted: { $exists: false },
     }).select('-date_added -date_modified -date_deleted');
 
     res
       .status(200)
-      .json({ data: { emergency_types: result }, status_code: 200 });
+      .json({ data: { emergency_statuses: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));
     res
@@ -26,18 +26,18 @@ router.get('/', routeAuth, auth, async (req, res) => {
   }
 });
 
-// Get single emergency types
+// Get single emergency status
 router.get('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await EmergencyTypes.findById(id).select(
+    const result = await EmergencyStatuses.findById(id).select(
       '-date_added -date_modified -date_deleted'
     );
 
     res
       .status(200)
-      .json({ data: { emergency_type: result }, status_code: 200 });
+      .json({ data: { emergency_status: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));
     res
@@ -46,7 +46,7 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
   }
 });
 
-// Create new emergency type
+// Create new emergency status
 router.post('/', routeAuth, auth, async (req, res) => {
   const { name, description = '' } = req.body;
 
@@ -57,7 +57,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
   }
 
   try {
-    const newEmergencyType = new EmergencyTypes({ name, description });
+    const newEmergencyType = new EmergencyStatuses({ name, description });
 
     await newEmergencyType.save();
 
@@ -73,7 +73,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
   }
 });
 
-// Update emergency type
+// Update emergency status
 router.patch('/:id', routeAuth, auth, async (req, res) => {
   const {
     params: { id },
@@ -88,7 +88,7 @@ router.patch('/:id', routeAuth, auth, async (req, res) => {
   }
 
   try {
-    const result = await EmergencyTypes.findByIdAndUpdate(id, {
+    const result = await EmergencyStatuses.findByIdAndUpdate(id, {
       name,
       description,
     });
@@ -105,12 +105,12 @@ router.patch('/:id', routeAuth, auth, async (req, res) => {
   }
 });
 
-// Delete emergency type
+// Delete emergency status
 router.delete('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await EmergencyTypes.findByIdAndUpdate(id, {
+    const result = await EmergencyStatuses.findByIdAndUpdate(id, {
       $set: {
         date_deleted: Date.now(),
       },

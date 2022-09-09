@@ -2,32 +2,35 @@ const express = require('express');
 
 const router = express.Router();
 
+const UserInfo = require('./../models/user_info');
+
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('./../middleware/auth');
 
-const UserInfo = require('./../models/user_info');
+// Get all user info
 
-router.get('/', routeAuth, auth, async (req, res) => {
-  const result = await UserInfo.findOne({ user_id: req.user.id });
+// Get single user info
+router.get('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
 
-  console.log(result);
+  try {
+    const result = await UserInfo.findById(id).select(
+      '-date_added -date_modified -date_deleted'
+    );
 
-  res.json({ data: result });
+    res.status(200).json({ data: { user_info: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
 });
 
-router.post('/', routeAuth, auth, async (req, res) => {
-  const { first_name, middle_name = '', last_name } = req.body;
-  const { id: user_id } = req.user;
+// Create user info
 
-  const newUserInfo = new UserInfo({
-    user_id,
-    first_name,
-    middle_name,
-    last_name,
-  });
+// Update user info
 
-  await newUserInfo.save();
-  res.json({ data: { success: true } });
-});
+// Delete user info
 
 module.exports = router;

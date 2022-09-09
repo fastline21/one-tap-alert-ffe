@@ -10,22 +10,54 @@ const UserInfo = require('./../models/user_info');
 const Contacts = require('./../models/contacts');
 
 const routeAuth = require('./../middleware/route-auth');
+const auth = require('../middleware/auth');
 
-router.get('/', routeAuth, async (req, res) => {
-  const result = await Users.find();
+// Get all users
+router.get('/', routeAuth, auth, async (req, res) => {
+  try {
+    const result = await Users.find({
+      date_deleted: { $exists: false },
+    }).select('-password -date_added -date_modified -date_deleted');
 
-  res.json({ data: result });
+    return res.status(200).json({ data: { users: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
 });
 
-router.post('/', async (req, res) => {
+// Get single user
+router.get('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await Users.findById(id).select(
+      '-password -date_added -date_modified -date_deleted'
+    );
+
+    return res.status(200).json({ data: { user: result }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
+
+// Create new user
+router.post('/', routeAuth, auth, async (req, res) => {
   const { username, password, password2, user_type_id } = req.body;
 
+  // Required fields
   if ((!username, !password, !user_type_id)) {
     return res.status(404).json({
       error: 'Please fill in all the required fields',
     });
   }
 
+  // Mismatch password
   if (password !== password2) {
     return res.status(400).json({ error: 'Password not match' });
   }
@@ -33,13 +65,16 @@ router.post('/', async (req, res) => {
   try {
     const user = await Users.findOne({ username });
 
+    // Exists user
     if (user) {
       return res.status(400).json({ message: 'User already registered' });
     }
 
+    // Encrypt password
     const salt = await bcrypt.genSalt(10);
     const newPassword = await bcrypt.hash(String(password), salt);
 
+    // New User
     const newUser = new Users({
       username,
       password: newPassword,
@@ -47,13 +82,20 @@ router.post('/', async (req, res) => {
     });
 
     await newUser.save();
-    return res.json({ data: { success: true } });
+
+    return res.status(200).json({
+      data: { message: `${name} is successfully created` },
+      status_code: 200,
+    });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).send({ error: 'Server Error' });
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
   }
 });
 
+// Register user - For mobile app
 router.post('/register', routeAuth, async (req, res) => {
   const {
     username,
@@ -68,36 +110,38 @@ router.post('/register', routeAuth, async (req, res) => {
     email_address: emailAddress,
   } = req.body;
 
-  // if (
-  // 	!username ||
-  // 	!password ||
-  // 	!password2 ||
-  // 	!firstName ||
-  // 	!middleName ||
-  // 	!lastName ||
-  // 	!address ||
-  // 	!barangayID ||
-  // 	!birthDate ||
-  // 	!emailAddress
-  // ) {
-  // 	return res.status(404).json({
-  // 		data: {
-  // 			message: "Please fill in all the required fields",
-  // 		},
-  // 		status_code: 404,
-  // 	});
-  // }
+  // Required fields
+  if (
+    !username ||
+    !password ||
+    !password2 ||
+    !firstName ||
+    !middleName ||
+    !lastName ||
+    !address ||
+    !barangayID ||
+    !birthDate ||
+    !emailAddress
+  ) {
+    return res.status(404).json({
+      data: {
+        message: 'Please fill in all the required fields',
+      },
+      status_code: 404,
+    });
+  }
 
-  // if (password !== password2) {
-  // 	return res
-  // 		.status(400)
-  // 		.json({ data: { message: "Password not match" }, status_code: 400 });
-  // }
+  // Mismatch password
+  if (password !== password2) {
+    return res
+      .status(400)
+      .json({ data: { message: 'Password not match' }, status_code: 400 });
+  }
 
   try {
-    console.log({ username });
     const user = await Users.findOne({ username });
 
+    // Exists user
     if (user) {
       return res.status(400).json({
         data: { message: 'User already registered' },
@@ -105,17 +149,21 @@ router.post('/register', routeAuth, async (req, res) => {
       });
     }
 
+    // Encrypt password
     const salt = await bcrypt.genSalt(10);
     const newPassword = await bcrypt.hash(String(password), salt);
 
+    // New user
     const newUser = new Users({
       username,
       password: newPassword,
       user_type_id: USER_TYPES.RESIDENT,
     });
 
+    // Get the new user id
     const { _id: userID } = await newUser.save();
 
+    // New user info
     const newUserInfo = new UserInfo({
       first_name: firstName,
       middle_name: middleName,
@@ -123,19 +171,51 @@ router.post('/register', routeAuth, async (req, res) => {
       birth_date: birthDate,
     });
 
+    await newUserInfo.save();
+
+    // New user contact
     const newContact = new Contacts({
       user_id: userID,
       own_table_name: 'users',
       own_primary_key: userID,
     });
 
-    return res.json({
+    await newContact.save();
+
+    return res.status(200).json({
       data: { message: 'You successfully register an account' },
       status_code: 200,
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).send({ error: 'Server Error' });
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
+
+// Update user
+
+// Delete user
+router.delete('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await UserTypes.findByIdAndUpdate(id, {
+      $set: {
+        date_deleted: Date.now(),
+      },
+    });
+
+    return res.status(200).json({
+      data: { message: `You successfully delete ${result.name}` },
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
   }
 });
 

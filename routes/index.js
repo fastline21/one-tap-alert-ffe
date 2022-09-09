@@ -16,4 +16,10 @@ router.use('/user-types', require('./user-types'));
 // Emergency Types API
 router.use('/emergency-types', require('./emergency-types'));
 
+// Emergency Statuses API
+router.use('/emergency-statuses', require('./emergency-statuses'));
+
+// Emergency Categories API
+router.use('/emergency-categories', require('./emergency-categories'));
+
 module.exports = router;
