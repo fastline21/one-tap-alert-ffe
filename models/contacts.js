@@ -32,7 +32,9 @@ const ContactsSchema = mongoose.Schema({
   },
   email_address: {
     type: String,
-    required: true,
+  },
+  zip_code: {
+    type: Number,
   },
   date_added: {
     type: Date,

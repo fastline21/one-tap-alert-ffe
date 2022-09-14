@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const Users = require('./../models/users');
+const UserTypes = require('./../models/user_types');
 
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('./../middleware/auth');
@@ -46,21 +47,28 @@ router.post('/', routeAuth, async (req, res) => {
     jwt.sign(payload, process.env.JWT_SECRET, (err, token) => {
       if (err) throw err;
 
-      return res.json({ data: { token }, status_code: 200 });
+      return res.status(200).json({ data: { token }, status_code: 200 });
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).send('Server Error');
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
   }
 });
 
 router.get('/', routeAuth, auth, async (req, res) => {
   try {
-    const user = await Users.findById(req.user.id).select(
-      '-password -date -username'
-    );
+    const user = await Users.findById(req.user.id)
+      .select('-password -date -username')
+      .populate([{ path: 'user_type_id', model: UserTypes }]);
 
-    res.json({ data: { user_id: user._id }, status_code: 200 });
+    console.log('Success: Get auth user - user', { user });
+
+    res.json({
+      data: { user_id: user._id, user_type: user.user_type_id.name },
+      status_code: 200,
+    });
   } catch (error) {
     console.error(JSON.stringify(error));
     res

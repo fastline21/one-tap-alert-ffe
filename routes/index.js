@@ -22,4 +22,10 @@ router.use('/emergency-statuses', require('./emergency-statuses'));
 // Emergency Categories API
 router.use('/emergency-categories', require('./emergency-categories'));
 
+// Gender API
+router.use('/gender', require('./gender'));
+
+// Contact Types API
+router.use('/contact-types', require('./contact-types'));
+
 module.exports = router;

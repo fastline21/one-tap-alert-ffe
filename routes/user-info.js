@@ -14,9 +14,11 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await UserInfo.findById(id).select(
+    const result = await UserInfo.findOne({ user_id: id }).select(
       '-date_added -date_modified -date_deleted'
     );
+
+    console.log({ result }, 'Result - Single User info');
 
     res.status(200).json({ data: { user_info: result }, status_code: 200 });
   } catch (error) {

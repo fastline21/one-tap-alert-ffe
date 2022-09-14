@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 const { USER_TYPES } = require('./../constants/user_types');
+const { GENDER } = require('./../constants/gender');
 
 const Users = require('./../models/users');
 const UserInfo = require('./../models/user_info');
@@ -97,6 +98,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
 
 // Register user - For mobile app
 router.post('/register', routeAuth, async (req, res) => {
+  // TODO: Create Barangay Model
   const {
     username,
     password,
@@ -105,7 +107,7 @@ router.post('/register', routeAuth, async (req, res) => {
     middle_name: middleName,
     last_name: lastName,
     address,
-    barangay_id: barangayID,
+    // barangay_id: barangayID,
     birth_date: birthDate,
     email_address: emailAddress,
   } = req.body;
@@ -116,10 +118,9 @@ router.post('/register', routeAuth, async (req, res) => {
     !password ||
     !password2 ||
     !firstName ||
-    !middleName ||
     !lastName ||
     !address ||
-    !barangayID ||
+    // !barangayID ||
     !birthDate ||
     !emailAddress
   ) {
@@ -139,7 +140,10 @@ router.post('/register', routeAuth, async (req, res) => {
   }
 
   try {
-    const user = await Users.findOne({ username });
+    const user = await Users.findOne({
+      username,
+      date_deleted: { $exists: false },
+    });
 
     // Exists user
     if (user) {
@@ -165,10 +169,12 @@ router.post('/register', routeAuth, async (req, res) => {
 
     // New user info
     const newUserInfo = new UserInfo({
+      user_id: userID,
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
       birth_date: birthDate,
+      gender_id: GENDER['MALE'],
     });
 
     await newUserInfo.save();
@@ -178,6 +184,8 @@ router.post('/register', routeAuth, async (req, res) => {
       user_id: userID,
       own_table_name: 'users',
       own_primary_key: userID,
+      contact_type_id: '630c79442759731d5879078b', // TODO: Change this to Contact Types Model
+      email_address: emailAddress,
     });
 
     await newContact.save();
@@ -201,7 +209,7 @@ router.delete('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await UserTypes.findByIdAndUpdate(id, {
+    const result = await Users.findByIdAndUpdate(id, {
       $set: {
         date_deleted: Date.now(),
       },
