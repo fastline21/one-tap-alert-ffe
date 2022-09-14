@@ -3,20 +3,21 @@ const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
-const { USER_TYPES } = require('./../constants/user_types');
-const { GENDER } = require('./../constants/gender');
-
-const Users = require('./../models/users');
-const UserInfo = require('./../models/user_info');
-const Contacts = require('./../models/contacts');
+const UsersModel = require('./../models/users');
+const UserInfoModel = require('./../models/user_info');
+const ContactsModel = require('./../models/contacts');
+const UserTypesModel = require('./../models/user_types');
+const ContactTypesModel = require('../models/contact_types');
 
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('../middleware/auth');
 
+const { checkRequiredFields } = require('../utils/requiredFields');
+
 // Get all users
 router.get('/', routeAuth, auth, async (req, res) => {
   try {
-    const result = await Users.find({
+    const result = await UsersModel.find({
       date_deleted: { $exists: false },
     }).select('-password -date_added -date_modified -date_deleted');
 
@@ -34,7 +35,7 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await Users.findById(id).select(
+    const result = await UsersModel.findById(id).select(
       '-password -date_added -date_modified -date_deleted'
     );
 
@@ -64,7 +65,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
   }
 
   try {
-    const user = await Users.findOne({ username });
+    const user = await UsersModel.findOne({ username });
 
     // Exists user
     if (user) {
@@ -76,7 +77,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
     const newPassword = await bcrypt.hash(String(password), salt);
 
     // New User
-    const newUser = new Users({
+    const newUser = new UsersModel({
       username,
       password: newPassword,
       user_type_id,
@@ -100,35 +101,37 @@ router.post('/', routeAuth, auth, async (req, res) => {
 router.post('/register', routeAuth, async (req, res) => {
   // TODO: Create Barangay Model
   const {
-    username,
-    password,
-    password2,
     first_name: firstName,
     middle_name: middleName,
     last_name: lastName,
-    address,
-    // barangay_id: barangayID,
     birth_date: birthDate,
+    address_1: address1,
+    address_2: address2,
+    barangay_id: barangayID,
+    zip_code: zipCode,
     email_address: emailAddress,
+    username,
+    password,
+    password_2: password2,
   } = req.body;
 
-  // Required fields
-  if (
-    !username ||
-    !password ||
-    !password2 ||
-    !firstName ||
-    !lastName ||
-    !address ||
-    // !barangayID ||
-    !birthDate ||
-    !emailAddress
-  ) {
-    return res.status(404).json({
-      data: {
-        message: 'Please fill in all the required fields',
-      },
-      status_code: 404,
+  const haveErrors = checkRequiredFields({
+    firstName,
+    lastName,
+    birthDate,
+    address1,
+    barangayID,
+    zipCode,
+    emailAddress,
+    username,
+    password,
+  });
+
+  // Required Fields
+  if (haveErrors.isError) {
+    return res.status(haveErrors.statusCode).json({
+      data: { message: haveErrors.message },
+      status_code: haveErrors.statusCode,
     });
   }
 
@@ -140,7 +143,7 @@ router.post('/register', routeAuth, async (req, res) => {
   }
 
   try {
-    const user = await Users.findOne({
+    const user = await UsersModel.findOne({
       username,
       date_deleted: { $exists: false },
     });
@@ -157,30 +160,34 @@ router.post('/register', routeAuth, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const newPassword = await bcrypt.hash(String(password), salt);
 
+    const residentUserType = await UserTypesModel.findOne({ tag: 'resident' });
+
     // New user
-    const newUser = new Users({
+    const newUser = new UsersModel({
       username,
       password: newPassword,
-      user_type_id: USER_TYPES.RESIDENT,
+      user_type_id: residentUserType._id,
     });
 
     // Get the new user id
     const { _id: userID } = await newUser.save();
 
     // New user info
-    const newUserInfo = new UserInfo({
+    const newUserInfo = new UserInfoModel({
       user_id: userID,
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
       birth_date: birthDate,
-      gender_id: GENDER['MALE'],
+      gender_id: genderID,
     });
 
     await newUserInfo.save();
 
+    const contactTypes = await ContactTypesModel.find({});
+
     // New user contact
-    const newContact = new Contacts({
+    const newContact = new ContactsModel({
       user_id: userID,
       own_table_name: 'users',
       own_primary_key: userID,
@@ -209,7 +216,7 @@ router.delete('/:id', routeAuth, auth, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await Users.findByIdAndUpdate(id, {
+    const result = await UsersModel.findByIdAndUpdate(id, {
       $set: {
         date_deleted: Date.now(),
       },

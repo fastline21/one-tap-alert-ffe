@@ -62,8 +62,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
   const newTag = tag ? convertRawTag(tag) : convertRawTag(name);
 
   try {
-    // TODO:
-    const newUserType = new ContactTypes({ name, newName, tag: newTag });
+    const newUserType = new ContactTypes({ name: newName, tag: newTag });
 
     await newUserType.save();
 

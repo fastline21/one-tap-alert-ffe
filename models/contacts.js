@@ -20,7 +20,10 @@ const ContactsSchema = mongoose.Schema({
     required: true,
     ref: 'contact_types',
   },
-  address: {
+  address_1: {
+    type: String,
+  },
+  address_2: {
     type: String,
   },
   barangay_id: {
