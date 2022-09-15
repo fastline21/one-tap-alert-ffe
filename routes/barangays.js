@@ -13,6 +13,20 @@ const ContactPersonsModel = require('./../models/contact_persons');
 const { checkRequiredFields } = require('./../utils/requiredFields');
 
 // Get all barangays
+router.get('/', routeAuth, auth, async (req, res) => {
+  try {
+    const barangays = await BarangaysModel.find({
+      date_deleted: { $exists: false },
+    });
+
+    return res.status(200).json({ data: { barangays }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
 
 // Get single barangay
 
