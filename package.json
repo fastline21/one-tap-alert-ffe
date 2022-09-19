@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "deploy": "git fetch && git pull origin master && npm install && pm2 restart index.js --watch"
+    "deploy": "pm2 stop api && git fetch && git pull origin master && npm install && pm2 start api --watch"
   },
   "keywords": [],
   "author": "Joshwa Facistol",

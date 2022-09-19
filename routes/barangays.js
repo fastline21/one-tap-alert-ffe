@@ -16,7 +16,14 @@ const { checkRequiredFields } = require('./../utils/requiredFields');
 router.get('/', routeAuth, auth, async (req, res) => {
   try {
     const barangays = await BarangaysModel.find({
-      date_deleted: { $exists: false },
+      $or: [
+        {
+          date_deleted: { $exists: false },
+        },
+        {
+          date_deleted: null,
+        },
+      ],
     });
 
     return res.status(200).json({ data: { barangays }, status_code: 200 });
@@ -29,6 +36,30 @@ router.get('/', routeAuth, auth, async (req, res) => {
 });
 
 // Get single barangay
+router.get('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const barangay = await BarangaysModel.findOne({
+      _id: id,
+      $or: [
+        {
+          date_deleted: { $exists: false },
+        },
+        {
+          date_deleted: null,
+        },
+      ],
+    });
+
+    return res.status(200).json({ data: { barangay }, status_code: 200 });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
 
 // Create new barangay
 router.post('/', routeAuth, auth, async (req, res) => {
@@ -140,5 +171,26 @@ router.post('/', routeAuth, auth, async (req, res) => {
 // Update barangay
 
 // Delete barangay
+router.delete('/:id', routeAuth, auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await BarangaysModel.findByIdAndUpdate(id, {
+      $set: {
+        date_deleted: Date.now(),
+      },
+    });
+
+    return res.status(200).json({
+      data: { message: `You successfully delete ${result.name}` },
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ data: { message: 'Server error' }, status_code: 500 });
+  }
+});
 
 module.exports = router;
