@@ -26,7 +26,8 @@ app.use('/api', require('./routes'));
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  const clientDir = path.resolve('client', 'build');
+  const clientDir = path.resolve('./', 'client', 'build');
+  console.log(clientDir);
   // Set static folder
   app.use(express.static(clientDir));
 
