@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const session = require('cookie-session');
+const path = require('path');
 
 const db = require('./config/db');
 db();
