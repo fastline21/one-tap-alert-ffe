@@ -26,12 +26,11 @@ app.use('/api', require('./routes'));
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
+  const clientDir = path.resolve('client', 'build');
   // Set static folder
-  app.use(express.static('client/build'));
+  app.use(express.static(clientDir));
 
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve('..', 'client', 'build', 'index.html'))
-  );
+  app.get('*', (req, res) => res.sendFile(path.join(clientDir, 'index.html')));
 }
 
 const port = process.env.PORT || 5000;
