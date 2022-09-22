@@ -19,7 +19,9 @@ router.get('/', routeAuth, auth, async (req, res) => {
   try {
     const result = await UsersModel.find({
       date_deleted: { $exists: false },
-    }).select('-password -date_added -date_modified -date_deleted');
+    })
+      .select('-password -date_added -date_modified -date_deleted')
+      .populate([{ path: 'user_type_id', model: UserTypesModel }]);
 
     return res.status(200).json({ data: { users: result }, status_code: 200 });
   } catch (error) {
@@ -86,7 +88,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
     await newUser.save();
 
     return res.status(200).json({
-      data: { message: `${name} is successfully created` },
+      data: { message: `${username} is successfully created` },
       status_code: 200,
     });
   } catch (error) {

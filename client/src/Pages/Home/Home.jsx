@@ -38,21 +38,29 @@ const Home = ({ authState: { user, loading }, loadUser, logoutUser }) => {
         <Row>
           <Sidebar />
           <main className="col-md-9 ms-lg-auto col-lg-10 px-md-4">
-            <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/user-types" element={<UserTypesPage />} />
-              <Route path="/emergency-types" element={<EmergencyTypesPage />} />
-              <Route
-                path="/emergency-statuses"
-                element={<EmergencyStatusesPage />}
-              />
-              <Route
-                path="/emergency-categories"
-                element={<EmergencyCategoriesPage />}
-              />
-              <Route path="/barangays" element={<BarangaysPage />} />
-              <Route path="/*" element={<NotFound />} />
-            </Routes>
+            <div
+              className="position-relative"
+              style={{ height: 'calc(85vh - 3rem)' }}
+            >
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/user-types" element={<UserTypesPage />} />
+                <Route
+                  path="/emergency-types"
+                  element={<EmergencyTypesPage />}
+                />
+                <Route
+                  path="/emergency-statuses"
+                  element={<EmergencyStatusesPage />}
+                />
+                <Route
+                  path="/emergency-categories"
+                  element={<EmergencyCategoriesPage />}
+                />
+                <Route path="/barangays" element={<BarangaysPage />} />
+                <Route path="/*" element={<NotFound />} />
+              </Routes>
+            </div>
           </main>
         </Row>
       </Container>

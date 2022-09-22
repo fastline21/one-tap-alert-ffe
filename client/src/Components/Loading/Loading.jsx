@@ -4,7 +4,7 @@ import { Image } from 'react-bootstrap';
 const Loading = () => {
   return (
     <div className="loading">
-      <Image src={require('Assets/Images/loading.gif')} fluid />
+      <Image src={require('Assets/Images/loading-transparent.gif')} fluid />
       <h3>Loading</h3>
     </div>
   );
