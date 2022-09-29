@@ -31,4 +31,7 @@ router.use('/contact-types', require('./contact-types'));
 // Barangays API
 router.use('/barangays', require('./barangays'));
 
+// Emergencies API
+router.use('/emergencies', require('./emergencies'));
+
 module.exports = router;
