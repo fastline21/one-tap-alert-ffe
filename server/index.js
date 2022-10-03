@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const session = require('cookie-session');
 const path = require('path');
+const fileUpload = require('express-fileupload');
 
 const db = require('./config/db');
 db();
@@ -13,6 +14,8 @@ const app = express();
 app.use(cors());
 
 app.use(express.json({ extended: true }));
+
+app.use(fileUpload());
 
 app.use(
   session({

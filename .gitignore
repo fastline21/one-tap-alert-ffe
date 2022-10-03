@@ -132,3 +132,6 @@ dist
 node_modules/
 
 client/build/
+
+# Uploaded Dir
+captured-image/
