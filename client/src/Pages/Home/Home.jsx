@@ -9,7 +9,9 @@ import { loadUser, logoutUser } from 'Services/Actions/auth';
 import Sidebar from 'Layouts/Sidebar';
 import Header from 'Layouts/Header';
 
+// Pages
 import DashboardPage from 'Pages/Dashboard';
+import EmergenciesPage from 'Pages/Emergencies';
 import UserTypesPage from 'Pages/UserTypes';
 import EmergencyTypesPage from 'Pages/EmergencyTypes';
 import EmergencyStatusesPage from 'Pages/EmergencyStatuses';
@@ -44,6 +46,7 @@ const Home = ({ authState: { user, loading }, loadUser, logoutUser }) => {
             >
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/emergencies" element={<EmergenciesPage />} />
                 <Route path="/user-types" element={<UserTypesPage />} />
                 <Route
                   path="/emergency-types"

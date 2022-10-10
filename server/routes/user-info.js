@@ -18,8 +18,6 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
       '-date_added -date_modified -date_deleted'
     );
 
-    console.log({ result }, 'Result - Single User info');
-
     res.status(200).json({ data: { user_info: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));

@@ -7,11 +7,63 @@ const router = express.Router();
 
 // Models
 const EmergenciesModel = require('./../models/emergencies');
+const EmergencyTypesModel = require('../models/emergency_types');
 const EmergencyStatusesModel = require('../models/emergency_statuses');
+const UsersModel = require('../models/users');
+const UserInfoModel = require('../models/user_info');
 
 // Middleware
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('./../middleware/auth');
+
+router.get('/', routeAuth, auth, async (req, res) => {
+  try {
+    const result = [];
+    const emergencies = await EmergenciesModel.find({
+      $or: [
+        {
+          date_deleted: { $exists: false },
+        },
+        {
+          date_deleted: null,
+        },
+      ],
+    }).populate([
+      { path: 'emergency_type_id', model: EmergencyTypesModel },
+      { path: 'emergency_status_id', model: EmergencyStatusesModel },
+    ]);
+
+    for (const emergency of emergencies) {
+      const { user_id } = emergency;
+
+      const userInfo = await UserInfoModel.findOne({
+        user_id,
+        $or: [
+          {
+            date_deleted: { $exists: false },
+          },
+          {
+            date_deleted: null,
+          },
+        ],
+      });
+
+      result.push({ ...emergency.toJSON(), user_info: userInfo.toJSON() });
+    }
+
+    return res.status(200).json({
+      data: { emergencies: result },
+      status_code: 200,
+      success: true,
+      message: 'You successfully got all emergencies',
+    });
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return res
+      .status(500)
+      .json({ status_code: 500, error: true, message: 'Server error' });
+  }
+});
 
 /**
  * Create Emergency
@@ -19,23 +71,8 @@ const auth = require('./../middleware/auth');
 router.post('/', routeAuth, auth, async (req, res) => {
   const { emergency_type_id: emergencyTypeID, latitude, longitude } = req.body;
   const { id: userID } = req.user;
-  const { captured_image_uri: capturedImageURI } = req.files;
 
   try {
-    const uploadPathDir = path.join('./', 'server', 'captured-image');
-
-    if (!fs.existsSync(uploadPathDir)) {
-      fs.mkdirSync(uploadPathDir, { recursive: true });
-    }
-
-    const filename = uuidv4();
-    const fileExt = path.extname(capturedImageURI.name);
-    const file = `${filename}${fileExt}`;
-
-    const uploadPath = path.resolve(uploadPathDir, file);
-
-    capturedImageURI.mv(uploadPath);
-
     const PendingEmergencyStatus = await EmergencyStatusesModel.findOne({
       name: 'Pending',
     });

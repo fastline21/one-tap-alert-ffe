@@ -1,14 +1,15 @@
-import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
+// Components
 import TotalRegisterResident from 'Components/TotalRegisterResident';
 import FireIncident from 'Components/FireIncident';
 import FloodIncident from 'Components/FloodIncident';
 import EarthquakeIncident from 'Components/EarthquakeIncident';
 
-const Dashboard = ({}) => {
+const Dashboard = () => {
   return (
     <Container>
       <Row>
@@ -23,6 +24,11 @@ const Dashboard = ({}) => {
         </Col>
         <Col>
           <EarthquakeIncident count="2" link="/earthquake-incident" />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Button onClick={() => sendPing()}>Click me</Button>
         </Col>
       </Row>
     </Container>
