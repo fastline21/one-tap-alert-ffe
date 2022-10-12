@@ -17,6 +17,7 @@ import EmergencyTypesPage from 'Pages/EmergencyTypes';
 import EmergencyStatusesPage from 'Pages/EmergencyStatuses';
 import EmergencyCategoriesPage from 'Pages/EmergencyCategories';
 import BarangaysPage from 'Pages/Barangays';
+import ReportsPage from 'Pages/Reports';
 import NotFound from 'Pages/NotFound';
 
 const Home = ({ authState: { user, loading }, loadUser, logoutUser }) => {
@@ -61,6 +62,7 @@ const Home = ({ authState: { user, loading }, loadUser, logoutUser }) => {
                   element={<EmergencyCategoriesPage />}
                 />
                 <Route path="/barangays" element={<BarangaysPage />} />
+                <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
             </div>

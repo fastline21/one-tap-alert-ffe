@@ -26,11 +26,6 @@ const Dashboard = () => {
           <EarthquakeIncident count="2" link="/earthquake-incident" />
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <Button onClick={() => sendPing()}>Click me</Button>
-        </Col>
-      </Row>
     </Container>
   );
 };

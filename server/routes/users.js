@@ -101,114 +101,100 @@ router.post('/', routeAuth, auth, async (req, res) => {
 
 // Register user - For mobile app
 router.post('/register', routeAuth, async (req, res) => {
-  // TODO: Create Barangay Model
-  const {
-    first_name: firstName,
-    middle_name: middleName,
-    last_name: lastName,
-    birth_date: birthDate,
-    address_1: address1,
-    address_2: address2,
-    barangay_id: barangayID,
-    zip_code: zipCode,
-    email_address: emailAddress,
-    username,
-    password,
-    password_2: password2,
-  } = req.body;
-
-  const haveErrors = checkRequiredFields({
-    firstName,
-    lastName,
-    birthDate,
-    address1,
-    barangayID,
-    zipCode,
-    emailAddress,
-    username,
-    password,
-  });
-
-  // Required Fields
-  if (haveErrors.isError) {
-    return res.status(haveErrors.statusCode).json({
-      data: { message: haveErrors.message },
-      status_code: haveErrors.statusCode,
-    });
-  }
-
-  // Mismatch password
-  if (password !== password2) {
-    return res
-      .status(400)
-      .json({ data: { message: 'Password not match' }, status_code: 400 });
-  }
-
-  try {
-    const user = await UsersModel.findOne({
-      username,
-      date_deleted: { $exists: false },
-    });
-
-    // Exists user
-    if (user) {
-      return res.status(400).json({
-        data: { message: 'User already registered' },
-        status_code: 400,
-      });
-    }
-
-    // Encrypt password
-    const salt = await bcrypt.genSalt(10);
-    const newPassword = await bcrypt.hash(String(password), salt);
-
-    const residentUserType = await UserTypesModel.findOne({ tag: 'resident' });
-
-    // New user
-    const newUser = new UsersModel({
-      username,
-      password: newPassword,
-      user_type_id: residentUserType._id,
-    });
-
-    // Get the new user id
-    const { _id: userID } = await newUser.save();
-
-    // New user info
-    const newUserInfo = new UserInfoModel({
-      user_id: userID,
-      first_name: firstName,
-      middle_name: middleName,
-      last_name: lastName,
-      birth_date: birthDate,
-      gender_id: genderID,
-    });
-
-    await newUserInfo.save();
-
-    const contactTypes = await ContactTypesModel.find({});
-
-    // New user contact
-    const newContact = new ContactsModel({
-      user_id: userID,
-      own_table_name: 'users',
-      own_primary_key: userID,
-      contact_type_id: '630c79442759731d5879078b', // TODO: Change this to Contact Types Model
-      email_address: emailAddress,
-    });
-
-    await newContact.save();
-
-    return res.status(200).json({
-      data: { message: 'You successfully register an account' },
-      status_code: 200,
-    });
-  } catch (error) {
-    console.error(JSON.stringify(error));
-    return res
-      .status(500)
-      .json({ data: { message: 'Server error' }, status_code: 500 });
-  }
+  console.log({ body: req.body, files: req.files });
+  // // TODO: Create Barangay Model
+  // const {
+  //   first_name: firstName,
+  //   middle_name: middleName,
+  //   last_name: lastName,
+  //   birth_date: birthDate,
+  //   address_1: address1,
+  //   address_2: address2,
+  //   barangay_id: barangayID,
+  //   zip_code: zipCode,
+  //   email_address: emailAddress,
+  //   username,
+  //   password,
+  //   password_2: password2,
+  // } = req.body;
+  // const haveErrors = checkRequiredFields({
+  //   firstName,
+  //   lastName,
+  //   birthDate,
+  //   address1,
+  //   barangayID,
+  //   zipCode,
+  //   emailAddress,
+  //   username,
+  //   password,
+  // });
+  // // Required Fields
+  // if (haveErrors.isError) {
+  //   return res.status(haveErrors.statusCode).json({
+  //     data: { message: haveErrors.message },
+  //     status_code: haveErrors.statusCode,
+  //   });
+  // }
+  // // Mismatch password
+  // if (password !== password2) {
+  //   return res
+  //     .status(400)
+  //     .json({ data: { message: 'Password not match' }, status_code: 400 });
+  // }
+  // try {
+  //   const user = await UsersModel.findOne({
+  //     username,
+  //     date_deleted: { $exists: false },
+  //   });
+  //   // Exists user
+  //   if (user) {
+  //     return res.status(400).json({
+  //       data: { message: 'User already registered' },
+  //       status_code: 400,
+  //     });
+  //   }
+  //   // Encrypt password
+  //   const salt = await bcrypt.genSalt(10);
+  //   const newPassword = await bcrypt.hash(String(password), salt);
+  //   const residentUserType = await UserTypesModel.findOne({ tag: 'resident' });
+  //   // New user
+  //   const newUser = new UsersModel({
+  //     username,
+  //     password: newPassword,
+  //     user_type_id: residentUserType._id,
+  //   });
+  //   // Get the new user id
+  //   const { _id: userID } = await newUser.save();
+  //   // New user info
+  //   const newUserInfo = new UserInfoModel({
+  //     user_id: userID,
+  //     first_name: firstName,
+  //     middle_name: middleName,
+  //     last_name: lastName,
+  //     birth_date: birthDate,
+  //     gender_id: genderID,
+  //   });
+  //   await newUserInfo.save();
+  //   const contactTypes = await ContactTypesModel.find({});
+  //   // New user contact
+  //   const newContact = new ContactsModel({
+  //     user_id: userID,
+  //     own_table_name: 'users',
+  //     own_primary_key: userID,
+  //     contact_type_id: '630c79442759731d5879078b', // TODO: Change this to Contact Types Model
+  //     email_address: emailAddress,
+  //   });
+  //   await newContact.save();
+  //   return res.status(200).json({
+  //     data: { message: 'You successfully register an account' },
+  //     status_code: 200,
+  //   });
+  // } catch (error) {
+  //   console.error(JSON.stringify(error));
+  //   return res
+  //     .status(500)
+  //     .json({ data: { message: 'Server error' }, status_code: 500 });
+  // }
 });
 
 // Update user

@@ -92,6 +92,7 @@ export const getBarangay = (data) => async (dispatch) => {
 // Create barangay
 export const createBarangay = (data) => async (dispatch) => {
   isLoading()(dispatch);
+  console.log('yes');
 
   try {
     setAuthToken(localStorage.token);
