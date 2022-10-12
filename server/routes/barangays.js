@@ -65,31 +65,31 @@ router.get('/:id', routeAuth, auth, async (req, res) => {
 router.post('/', routeAuth, auth, async (req, res) => {
   const { id: userID } = req.user;
   const {
-    district_number: districtNumber,
-    district_code: districtCode,
+    // district_number: districtNumber,
+    // district_code: districtCode,
     name,
-    address_1: address1,
-    address_2: address2,
-    contact_person: contactPerson,
-    phone_number: phoneNumber,
+    // address_1: address1,
+    // address_2: address2,
+    // contact_person: contactPerson,
+    // phone_number: phoneNumber,
   } = req.body;
 
-  const haveErrors = checkRequiredFields({
-    district_number: districtNumber,
-    district_code: districtCode,
-    name,
-    address_1: address1,
-    contact_person_first_name: contactPerson.first_name,
-    contact_person_last_name: contactPerson.last_name,
-    phone_number: phoneNumber,
-  });
+  // const haveErrors = checkRequiredFields({
+  //   district_number: districtNumber,
+  //   district_code: districtCode,
+  //   name,
+  //   address_1: address1,
+  //   contact_person_first_name: contactPerson.first_name,
+  //   contact_person_last_name: contactPerson.last_name,
+  //   phone_number: phoneNumber,
+  // });
 
-  if (haveErrors.isError) {
-    return res.status(haveErrors.statusCode).json({
-      data: { message: haveErrors.message },
-      status_code: haveErrors.statusCode,
-    });
-  }
+  // if (haveErrors.isError) {
+  //   return res.status(haveErrors.statusCode).json({
+  //     data: { message: haveErrors.message },
+  //     status_code: haveErrors.statusCode,
+  //   });
+  // }
 
   try {
     const existsBarangay = await BarangaysModel.findOne({
@@ -104,57 +104,58 @@ router.post('/', routeAuth, auth, async (req, res) => {
       });
     }
 
-    const contactTypes = await ContactTypesModel.find();
-    const contactTypeAddress = contactTypes.find(
-      (data) => data.name === 'Address'
-    );
-    const contactTypePhoneNumber = contactTypes.find(
-      (data) => data.name === 'Phone'
-    );
+    // const contactTypes = await ContactTypesModel.find();
+    // const contactTypeAddress = contactTypes.find(
+    //   (data) => data.name === 'Address'
+    // );
+    // const contactTypePhoneNumber = contactTypes.find(
+    //   (data) => data.name === 'Phone'
+    // );
 
     const newBarangay = new BarangaysModel({
       user_id: userID,
-      district_code: districtCode,
-      district_number: districtNumber,
+      // district_code: districtCode,
+      // district_number: districtNumber,
       name,
-      address_1: address1,
-      address_2: address2,
+      // address_1: address1,
+      // address_2: address2,
     });
 
-    const { _id: barangayID } = await newBarangay.save();
+    await newBarangay.save();
+    // const { _id: barangayID } = await newBarangay.save();
 
-    const newContactAddress = new ContactsModel({
-      user_id: userID,
-      own_table_name: 'barangays',
-      own_primary_key: barangayID,
-      contact_type_id: contactTypeAddress._id,
-      address_1: address1,
-      address_2: address2,
-      barangay_id: barangayID,
-    });
+    // const newContactAddress = new ContactsModel({
+    //   user_id: userID,
+    //   own_table_name: 'barangays',
+    //   own_primary_key: barangayID,
+    //   contact_type_id: contactTypeAddress._id,
+    //   address_1: address1,
+    //   address_2: address2,
+    //   barangay_id: barangayID,
+    // });
 
-    await newContactAddress.save();
+    // await newContactAddress.save();
 
-    const newContactPhone = new ContactsModel({
-      user_id: userID,
-      own_table_name: 'barangays',
-      own_primary_key: barangayID,
-      contact_type_id: contactTypePhoneNumber._id,
-      phone_number: phoneNumber,
-    });
+    // const newContactPhone = new ContactsModel({
+    //   user_id: userID,
+    //   own_table_name: 'barangays',
+    //   own_primary_key: barangayID,
+    //   contact_type_id: contactTypePhoneNumber._id,
+    //   phone_number: phoneNumber,
+    // });
 
-    await newContactPhone.save();
+    // await newContactPhone.save();
 
-    const newContactPerson = new ContactPersonsModel({
-      user_id: userID,
-      own_table_name: 'barangays',
-      own_primary_key: barangayID,
-      first_name: contactPerson.first_name,
-      middle_name: contactPerson.middle_name,
-      last_name: contactPerson.last_name,
-    });
+    // const newContactPerson = new ContactPersonsModel({
+    //   user_id: userID,
+    //   own_table_name: 'barangays',
+    //   own_primary_key: barangayID,
+    //   first_name: contactPerson.first_name,
+    //   middle_name: contactPerson.middle_name,
+    //   last_name: contactPerson.last_name,
+    // });
 
-    await newContactPerson.save();
+    // await newContactPerson.save();
 
     return res.status(200).json({
       data: { message: `You successfully created Barangay ${name}` },

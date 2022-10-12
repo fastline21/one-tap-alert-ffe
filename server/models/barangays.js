@@ -10,11 +10,11 @@ const BarangaysSchema = mongoose.Schema({
   },
   district_number: {
     type: Number,
-    required: true,
+    // required: true,
   },
   district_code: {
     type: String,
-    required: true,
+    // required: true,
   },
   name: {
     type: String,
