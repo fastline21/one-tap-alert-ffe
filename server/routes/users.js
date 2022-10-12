@@ -22,7 +22,7 @@ router.get('/', routeAuth, auth, async (req, res) => {
     })
       .select('-password -date_added -date_modified -date_deleted')
       .populate([{ path: 'user_type_id', model: UserTypesModel }]);
-
+    console.log(result);
     return res.status(200).json({ data: { users: result }, status_code: 200 });
   } catch (error) {
     console.error(JSON.stringify(error));

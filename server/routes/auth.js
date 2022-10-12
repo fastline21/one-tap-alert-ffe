@@ -63,8 +63,6 @@ router.get('/', routeAuth, auth, async (req, res) => {
       .select('-password -date -username')
       .populate([{ path: 'user_type_id', model: UserTypes }]);
 
-    console.log('Success: Get auth user - user', { user });
-
     res.json({
       data: { user_id: user._id, user_type: user.user_type_id.name },
       status_code: 200,
