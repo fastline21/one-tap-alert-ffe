@@ -6,6 +6,8 @@ import { getAllEmergencies } from 'Services/Actions/emergencies.action';
 
 import { EmergenciesTable } from 'Components/Emergencies';
 
+import Loading from 'Components/Loading';
+
 const Emergencies = ({
   emergenciesState: { emergencies, loading, error },
   getAllEmergencies,
@@ -14,10 +16,14 @@ const Emergencies = ({
     getAllEmergencies();
   }, []);
 
+  if (loading || !emergencies) {
+    return <Loading />;
+  }
+
   return (
     <>
       <h1>Emergencies</h1>
-      {!emergencies || !emergencies.length ? (
+      {!emergencies.length ? (
         <p>Not found</p>
       ) : (
         <EmergenciesTable data={emergencies} />

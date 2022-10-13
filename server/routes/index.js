@@ -34,4 +34,7 @@ router.use('/barangays', require('./barangays'));
 // Emergencies API
 router.use('/emergencies', require('./emergencies'));
 
+// Emergency Proofs API
+router.use('/emergency-proofs', require('./emergency-proofs'));
+
 module.exports = router;

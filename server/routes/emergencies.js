@@ -16,6 +16,9 @@ const UserInfoModel = require('../models/user_info');
 const routeAuth = require('./../middleware/route-auth');
 const auth = require('./../middleware/auth');
 
+/**
+ * Get all emergencies
+ */
 router.get('/', routeAuth, auth, async (req, res) => {
   try {
     const result = [];
@@ -85,17 +88,22 @@ router.post('/', routeAuth, auth, async (req, res) => {
       longitude,
     });
 
-    await newEmergency.save();
+    const emergency = await newEmergency.save();
 
     return res.status(200).json({
-      data: { success: true, message: 'You successfully submit an emergency' },
+      data: { emergency },
       status_code: 200,
+      success: true,
+      message: 'You successfully submit an emergency',
     });
   } catch (error) {
     console.error(JSON.stringify(error));
-    return res
-      .status(500)
-      .json({ data: { message: 'Server Error' }, status_code: 500 });
+    return res.status(500).json({
+      data: {},
+      status_code: 500,
+      message: 'Server Error',
+      error: true,
+    });
   }
 });
 
