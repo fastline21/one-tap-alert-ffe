@@ -1,5 +1,7 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -20,7 +22,11 @@ router.post('/', routeAuth, auth, async (req, res) => {
   const { captured_image_uri: capturedImageURI } = req.files;
 
   try {
-    const uploadPathDir = path.join('./', 'server', 'captured-image');
+    const uploadPathDir = path.join(
+      path.resolve('./'),
+      'server',
+      'captured-image'
+    );
 
     if (!fs.existsSync(uploadPathDir)) {
       fs.mkdirSync(uploadPathDir, { recursive: true });
@@ -50,7 +56,7 @@ router.post('/', routeAuth, auth, async (req, res) => {
       message: 'You successfully submit an emergency proof',
     });
   } catch (error) {
-    console.error(JSON.stringify(error));
+    console.error('Emergency Proof Create endpoint', JSON.stringify(error));
     return res.status(500).json({
       data: {},
       status_code: 500,
